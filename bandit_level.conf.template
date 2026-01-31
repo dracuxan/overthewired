@@ -1,2 +1,9 @@
-BANDIT_LEVEL=0
-LEVEL_CLEARED=false
+# Bandit launcher config
+# Used only when no --level flag is supplied
+
+LEVEL=0
+
+# Remote sync target
+SYNC_HOST=igris@ip_address
+SYNC_DIR=~/bandit_passwords
+
