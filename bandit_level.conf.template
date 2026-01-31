@@ -6,4 +6,3 @@ LEVEL=0
 # Remote sync target
 SYNC_HOST=igris@ip_address
 SYNC_DIR=~/bandit_passwords
-

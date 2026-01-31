@@ -113,14 +113,20 @@ post_run() {
 
     if [[ "$cleared" =~ ^[yY]$ ]]; then
         local next_level=$((LEVEL + 1))
+        local next_pass_file
+        next_pass_file="$(password_file "$next_level")"
 
-        read -p "store password for level $next_level? (y/n): " store
-        if [[ "$store" =~ ^[yY]$ ]]; then
-            read -s -p "enter password for level $next_level: " pw
-            echo
-            echo "$pw" >"$(password_file "$next_level")"
-            chmod 600 "$(password_file "$next_level")"
-            echo "password for level $next_level stored"
+        if [[ -f "$next_pass_file" ]]; then
+            echo "password for level $next_level already exists"
+        else
+            read -p "store password for level $next_level? (y/n): " store
+            if [[ "$store" =~ ^[yY]$ ]]; then
+                read -s -p "enter password for level $next_level: " pw
+                echo
+                echo "$pw" >"$next_pass_file"
+                chmod 600 "$next_pass_file"
+                echo "password for level $next_level stored"
+            fi
         fi
 
         if [[ -z "$CLI_LEVEL" ]]; then
