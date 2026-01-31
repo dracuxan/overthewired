@@ -8,9 +8,22 @@ TEMPLATE="./bandit_level.conf.template"
 LEVEL=""
 CLI_LEVEL=""
 SYNC_ONLY=false
-
+PULL_ONLY=false
 
 VERSION="v0.1"
+
+show_help() {
+    echo "bandit $VERSION"
+    echo "Usage: bandit [options]"
+    echo
+    echo "Options:"
+    echo "  --level <n>   Start at a specific level"
+    echo "  --sync        Force sync passwords to remote server"
+    echo "  --pull        Pull passwords from remote server"
+    echo "  --version     Show version information"
+    echo "  --help        Show this help message"
+    exit 0
+}
 
 init_config() {
     mkdir -p "$CONFIG_DIR" "$PASS_DIR"
@@ -34,19 +47,6 @@ check_dependencies() {
     fi
 }
 
-show_help() {
-    echo "bandit.sh $VERSION"
-    echo "Usage: ./bandit.sh [options]"
-    echo
-    echo "Options:"
-    echo "  --level <n>   Start at a specific level"
-    echo "  --sync        Force sync passwords to remote server"
-    echo "  --pull        Pull passwords from remote server"
-    echo "  --version     Show version information"
-    echo "  --help        Show this help message"
-    exit 0
-}
-
 parse_args() {
 
     while [[ $# -gt 0 ]]; do
@@ -68,7 +68,7 @@ parse_args() {
             shift
             ;;
         --version)
-            echo "bandit.sh $VERSION"
+            echo "bandit $VERSION"
             exit 0
             ;;
         --help)
@@ -218,7 +218,7 @@ main() {
         exit 0
     fi
 
-    if [[ "${PULL_ONLY:-false}" == "true" ]]; then
+    if $PULL_ONLY; then
         pull_passwords
         exit 0
     fi
