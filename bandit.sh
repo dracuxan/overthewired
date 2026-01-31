@@ -9,7 +9,8 @@ LEVEL=""
 CLI_LEVEL=""
 SYNC_ONLY=false
 
-# ---------- init ----------
+
+VERSION="v0.1"
 
 init_config() {
     mkdir -p "$CONFIG_DIR" "$PASS_DIR"
@@ -19,7 +20,32 @@ init_config() {
     fi
 }
 
-# ---------- args ----------
+check_dependencies() {
+    local missing=false
+    for cmd in sshpass rsync; do
+        if ! command -v "$cmd" &>/dev/null; then
+            echo "error: $cmd is not installed."
+            missing=true
+        fi
+    done
+    if $missing; then
+        echo "please install missing dependencies and try again."
+        exit 1
+    fi
+}
+
+show_help() {
+    echo "bandit.sh $VERSION"
+    echo "Usage: ./bandit.sh [options]"
+    echo
+    echo "Options:"
+    echo "  --level <n>   Start at a specific level"
+    echo "  --sync        Force sync passwords to remote server"
+    echo "  --pull        Pull passwords from remote server"
+    echo "  --version     Show version information"
+    echo "  --help        Show this help message"
+    exit 0
+}
 
 parse_args() {
 
@@ -41,6 +67,13 @@ parse_args() {
             PULL_ONLY=true
             shift
             ;;
+        --version)
+            echo "bandit.sh $VERSION"
+            exit 0
+            ;;
+        --help)
+            show_help
+            ;;
         *)
             echo "unknown argument: $1"
             exit 1
@@ -48,8 +81,6 @@ parse_args() {
         esac
     done
 }
-
-# ---------- config ----------
 
 load_config_level() {
     [[ -f "$CONFIG_FILE" ]] || return
@@ -61,7 +92,6 @@ write_config_level() {
     local new_level="$1"
 
     if [[ -f "$CONFIG_FILE" ]]; then
-        # replace existing LEVEL= line or append if missing
         if grep -q '^LEVEL=' "$CONFIG_FILE"; then
             sed -i "s/^LEVEL=.*/LEVEL=$new_level/" "$CONFIG_FILE"
         else
@@ -83,8 +113,6 @@ resolve_level() {
         exit 1
     fi
 }
-
-# ---------- passwords ----------
 
 password_file() {
     echo "$PASS_DIR/level$1"
@@ -117,8 +145,6 @@ pull_passwords() {
     rsync -av "$SYNC_HOST:$SYNC_DIR/" "$PASS_DIR/"
     echo "pull complete"
 }
-
-# ---------- run ----------
 
 run_level() {
     local user="bandit$LEVEL"
@@ -181,9 +207,8 @@ post_run() {
     fi
 }
 
-# ---------- main ----------
-
 main() {
+    check_dependencies
     init_config
     parse_args "$@"
     load_config_level
@@ -204,9 +229,9 @@ main() {
         run_level
         post_run
         case $? in
-        0) LEVEL=$((LEVEL + 1)) ;; # next level
-        1) : ;;                    # retry same level
-        2) break ;;                # exit
+        0) LEVEL=$((LEVEL + 1)) ;;
+        1) : ;;
+        2) break ;;
         esac
     done
 }

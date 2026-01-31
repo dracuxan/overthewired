@@ -1,0 +1,7 @@
+# Config and Passwords
+bandit_level.conf
+passwords/
+
+# System Files
+.DS_Store
+Thumbs.db

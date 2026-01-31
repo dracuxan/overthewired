@@ -8,10 +8,28 @@ This script simplifies playing the [OverTheWire Bandit wargame](https://overthew
 
 The script connects to the current level using `sshpass` if the password is stored. If not, it falls back to a manual SSH connection. After each run, it asks if you've cleared the level and prompts to save the password for the next level.
 
-Usage:
+## Installation
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+- `sshpass`
+- `rsync`
+- `bash`
+
+### Quick Install
+
+To install the script globally:
 
 ```bash
-./bandit.sh [--level <n>]
+./install.sh
+```
+
+## Usage
+
+```bash
+bandit [--level <n>] [--sync] [--pull] [--version] [--help]
 ```
 
 ## Storage
