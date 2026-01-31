@@ -53,7 +53,18 @@ load_config_level() {
 }
 
 write_config_level() {
-    echo "LEVEL=$1" >"$CONFIG_FILE"
+    local new_level="$1"
+
+    if [[ -f "$CONFIG_FILE" ]]; then
+        # replace existing LEVEL= line or append if missing
+        if grep -q '^LEVEL=' "$CONFIG_FILE"; then
+            sed -i "s/^LEVEL=.*/LEVEL=$new_level/" "$CONFIG_FILE"
+        else
+            echo "LEVEL=$new_level" >>"$CONFIG_FILE"
+        fi
+    else
+        echo "LEVEL=$new_level" >"$CONFIG_FILE"
+    fi
 }
 
 resolve_level() {
@@ -109,6 +120,8 @@ run_level() {
 }
 
 post_run() {
+    local wrote_password=false
+
     read -p "did you clear level $LEVEL? (y/n): " cleared
 
     if [[ "$cleared" =~ ^[yY]$ ]]; then
@@ -126,12 +139,21 @@ post_run() {
                 echo "$pw" >"$next_pass_file"
                 chmod 600 "$next_pass_file"
                 echo "password for level $next_level stored"
+                wrote_password=true
             fi
         fi
 
         if [[ -z "$CLI_LEVEL" ]]; then
             write_config_level "$next_level"
             echo "default level updated to $next_level"
+        fi
+
+        if $wrote_password && [[ -n "$SYNC_HOST" && -n "$SYNC_DIR" ]]; then
+            read -p "sync passwords to $SYNC_HOST? (y/n): " sync
+            if [[ "$sync" =~ ^[yY]$ ]]; then
+                rsync -av "$PASS_DIR/" "$SYNC_HOST:$SYNC_DIR/"
+                echo "passwords synced"
+            fi
         fi
 
         read -p "continue to level $next_level? (y/n): " cont
