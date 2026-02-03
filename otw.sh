@@ -25,7 +25,7 @@ show_help() {
     echo "Usage: otw [options]"
     echo
     echo "Options:"
-    echo "  --game <name>     select game (bandit/b, leviathan/l). Default: bandit"
+    echo "  --game <name>     select game (bandit/b, leviathan/l, narnia/n). Default: bandit"
     echo "  --level <n>       start at a specific level"
     echo "  --sync            force sync passwords to remote server"
     echo "  --pull            pull passwords from remote server"
@@ -79,6 +79,11 @@ set_game_config() {
         GAME="leviathan"
         HOST="leviathan.labs.overthewire.org"
         PORT="2223"
+        ;;
+    narnia | n)
+        GAME="narnia"
+        HOST="narnia.labs.overthewire.org"
+        PORT="2226"
         ;;
     *)
         echo "error: unknown game '$GAME'"
@@ -137,6 +142,7 @@ load_config_level() {
     [[ -f "$GAME_CONFIG_FILE" ]] || return
     source "$GAME_CONFIG_FILE"
     LEVEL="${LEVEL:-}"
+    MAX_LEVEL="${MAX_LEVEL:-}"
 }
 
 write_config_level() {
@@ -216,7 +222,7 @@ pull_current_game() {
 
 sync_all() {
     echo "Syncing ALL games..."
-    for g in bandit leviathan; do
+    for g in bandit leviathan narnia; do
         # Read config without loading into global state
         local conf_data
         conf_data=$(get_sync_config "$g")
@@ -276,6 +282,11 @@ post_run() {
     read -p "did you clear level $LEVEL? (y/n): " cleared
 
     if [[ "$cleared" =~ ^[yY]$ ]]; then
+        if [[ -n "$MAX_LEVEL" && "$LEVEL" -ge "$MAX_LEVEL" ]]; then
+            echo "yay game cleared!! $GAME (level $MAX_LEVEL)!"
+            return 2
+        fi
+
         local next_level=$((LEVEL + 1))
         local next_pass_file
         next_pass_file="$(password_file "$next_level")"
