@@ -5,9 +5,7 @@ CONFIG_DIR="$HOME/.config/overthewire"
 CONFIGS_DIR="$CONFIG_DIR/configs"
 PASS_DIR="$CONFIG_DIR/passwords"
 
-# Templates
-BANDIT_TEMPLATE="./bandit_level.conf.template"
-LEVI_TEMPLATE="./leviathan_level.conf.template"
+LOCAL_CONFIGS_DIR="./configs"
 
 # State
 GAME="bandit" # Default game
@@ -17,7 +15,6 @@ SYNC_ONLY=false
 PULL_ONLY=false
 VERSION="v0.2"
 
-# Game specific variables (set in set_game_config)
 HOST=""
 PORT=""
 GAME_CONFIG_FILE=""
@@ -54,18 +51,20 @@ check_dependencies() {
 init_config() {
     mkdir -p "$CONFIG_DIR" "$CONFIGS_DIR" "$PASS_DIR"
 
-    # Init Bandit
-    local bandit_conf="$CONFIGS_DIR/bandit_level.conf"
-    if [[ ! -f "$bandit_conf" ]]; then
-        [[ -f "$BANDIT_TEMPLATE" ]] && cp "$BANDIT_TEMPLATE" "$bandit_conf" || touch "$bandit_conf"
-        echo "initialized bandit config at $bandit_conf"
-    fi
+    if [[ -d "$LOCAL_CONFIGS_DIR" ]]; then
+        echo "Initializing configs from $LOCAL_CONFIGS_DIR..."
+        for conf in "$LOCAL_CONFIGS_DIR"/*.conf; do
+            [[ -e "$conf" ]] || continue
+            filename=$(basename "$conf")
+            target="$CONFIGS_DIR/$filename"
 
-    # Init Leviathan
-    local levi_conf="$CONFIGS_DIR/leviathan_level.conf"
-    if [[ ! -f "$levi_conf" ]]; then
-        [[ -f "$LEVI_TEMPLATE" ]] && cp "$LEVI_TEMPLATE" "$levi_conf" || touch "$levi_conf"
-        echo "initialized leviathan config at $levi_conf"
+            if [[ ! -f "$target" ]]; then
+                cp "$conf" "$target"
+                echo "Initialized $target"
+            fi
+        done
+    else
+        echo "Warning: Local configs directory not found at $LOCAL_CONFIGS_DIR"
     fi
 }
 

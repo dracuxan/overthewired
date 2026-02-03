@@ -17,17 +17,25 @@ Ensure you have the following installed:
 - `rsync`
 - `bash`
 
-### Quick Install
+### Manual Installation
+Since there is no install script, you can set it up manually:
 
-To install the script globally as `otw`:
-
-```bash
-./install.sh
-```
+1.  Make the script executable:
+    ```bash
+    chmod +x otw.sh
+    ```
+2.  (Optional) Create a symlink to run it from anywhere:
+    ```bash
+    ln -s "$(pwd)/otw.sh" ~/.local/bin/otw
+    ```
 
 ## Usage
 ```bash
-otw --game [bandit|leviathan] [--level <n>] [--sync] [--pull] [--version] [--help]
+./otw.sh --game [bandit|leviathan] ...
+```
+OR if symlinked:
+```bash
+otw --game [bandit|leviathan] ...
 ```
 *   **Default Game**: `bandit` (if `--game` is omitted).
 *   **Shortcuts**: You can use `-g b` for bandit or `-g l` for leviathan.
