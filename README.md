@@ -49,10 +49,10 @@ otw --game [bandit|leviathan] ...
 
 ## Storage
 
-All game data is stored in your local configuration directory: `~/.config/bandit/`.
+All game data is stored in your local configuration directory: `~/.config/overthewire/`.
 
-- **Progress**: Your current level is tracked in `bandit_level.conf`.
-- **Passwords**: Retrieved passwords are securely stored in the `passwords/` subdirectory (e.g., `passwords/level5`).
+- **Progress**: Your current level is tracked in `configs/[game]_level.conf`.
+- **Passwords**: Retrieved passwords are securely stored in the `passwords/[game]/` subdirectory (e.g., `passwords/bandit/level5`).
 
 ## Sync and Backup
 
@@ -70,9 +70,9 @@ Host my-game-server
   IdentitiesOnly yes
 ```
 
-### 2. Configure Bandit
+### 2. Configure Game
 
-Edit `~/.config/bandit/bandit_level.conf` to point to your SSH alias:
+Edit `~/.config/overthewire/configs/bandit_level.conf` to point to your SSH alias:
 
 ```bash
 SYNC_HOST=""    # Set this to your Host alias (e.g., 'my-game-server')
@@ -81,20 +81,9 @@ SYNC_DIR=""     # Path to remote backup directory
 
 ### 3. Usage
 
-- **Push**: The script offers to sync after storing a new password. Force push with `./bandit.sh --sync`.
-- **Pull**: Retrieve passwords from the server using `./bandit.sh --pull`. This updates `passwords/` without overwriting config.
+- **Push**: The script offers to sync after storing a new password. Force push with `./otw.sh --sync`.
+- **Pull**: Retrieve passwords from the server using `./otw.sh --pull`. This updates passwords without overwriting local config.
 
 ## Why Sync?
 
-## Release Notes
-
-### v0.2
-
-- **Multi-Game Support**: Play **Bandit**, **Leviathan**, and **Narnia** using the `--game` flag.
-- **Unified Sync**: `--sync` backsup progress for **all** configured games at once.
-- **Game Completion**: Detects when you finish a game (via `MAX_LEVEL`) and shows a congratulatory message.
-- **Dynamic Configuration**: Easily add new games by dropping a file into `configs/`.
-
-### v0.1
-
-- Initial release supporting Bandit.
+I switch between devices (e.g., Laptop and Termux) sometimes and to prepare for future support of other wargames.
