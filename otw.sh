@@ -14,6 +14,7 @@ CLI_LEVEL=""
 SYNC_ONLY=false
 PULL_ONLY=false
 VERSION="v0.2"
+REMOTE_COMMAD=""
 
 HOST=""
 PORT=""
@@ -129,6 +130,10 @@ parse_args() {
             ;;
         --help)
             show_help
+            ;;
+        --args)
+            REMOTE_COMMAD="$2"
+            shift 2
             ;;
         *)
             echo "unknown argument: $1"
@@ -268,11 +273,11 @@ run_level() {
     if password_exists "$LEVEL"; then
         echo "using stored password for $GAME level $LEVEL"
         sshpass -f "$pass_file" \
-            ssh "$user@$HOST" -p "$PORT"
+            ssh "$user@$HOST" -p "$PORT" "$REMOTE_COMMAD"
     else
         echo "no stored password for $GAME level $LEVEL"
         echo "connecting manually..."
-        ssh "$user@$HOST" -p "$PORT"
+        ssh "$user@$HOST" -p "$PORT" "$REMOTE_COMMAD"
     fi
 }
 
@@ -282,6 +287,7 @@ post_run() {
     read -p "did you clear level $LEVEL? (y/n): " cleared
 
     if [[ "$cleared" =~ ^[yY]$ ]]; then
+        REMOTE_COMMAD=""
         if [[ -n "$MAX_LEVEL" && "$LEVEL" -ge "$MAX_LEVEL" ]]; then
             echo "yay game cleared!! $GAME (level $MAX_LEVEL)!"
             return 2
